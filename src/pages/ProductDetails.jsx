@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Expand, Heart, Minus, Plus, Ruler, Truck, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, Check, Heart, MapPin, ShieldCheck, Truck } from "lucide-react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ProductCard from "../components/product/ProductCard";
 import { EASE } from "../data/brand";
@@ -11,167 +11,273 @@ export default function ProductDetails() {
   const { id } = useParams();
   const product = PRODUCTS.find((p) => p.id === id) || PRODUCTS[0];
   const { addToCart, toggleWishlist, wishlist } = useStore();
-  const [img, setImg] = useState(0);
-  const [size, setSize] = useState(product.sizes.includes("M") ? "M" : product.sizes[0]);
-  const [color, setColor] = useState(product.colors[0].name);
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || "");
+  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || "");
   const [qty, setQty] = useState(1);
-  const [stage, setStage] = useState("idle");
-  const [lightbox, setLightbox] = useState(false);
-  const [tab, setTab] = useState("details");
+  const [added, setAdded] = useState(false);
+
   const wished = wishlist.includes(product.id);
 
-  useEffect(() => { setImg(0); setSize(product.sizes.includes("M") ? "M" : product.sizes[0]); setColor(product.colors[0].name); setQty(1); window.scrollTo(0, 0); }, [id]); // eslint-disable-line
+  const imageLabels = [
+    "1. FULL SILHOUETTE",
+    "2. FABRIC TEXTURE",
+    "3. STITCH & CRAFT DETAIL",
+    "4. CAIRO ENVIRONMENT",
+    "5. BACK & SIDE DRAPE",
+  ];
 
-  useEffect(() => {
-    const on = (e) => {
-      if (e.key === "ArrowRight") setImg((v) => (v + 1) % product.images.length);
-      if (e.key === "ArrowLeft") setImg((v) => (v - 1 + product.images.length) % product.images.length);
-      if (e.key === "Escape") setLightbox(false);
-    };
-    window.addEventListener("keydown", on);
-    return () => window.removeEventListener("keydown", on);
-  }, [product]);
-
-  const related = useMemo(() => PRODUCTS.filter((p) => p.id !== product.id && (p.category === product.category || p.collection === product.collection)).slice(0, 4), [product]);
-
-  const add = () => {
-    if (stage !== "idle") return;
-    setStage("adding");
-    setTimeout(() => {
-      addToCart({ id: product.id, size, color, qty });
-      setStage("added");
-      setTimeout(() => setStage("idle"), 1800);
-    }, 650);
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      color: selectedColor,
+      size: selectedSize,
+      qty,
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
   };
 
+  const relatedProducts = PRODUCTS.filter(
+    (p) => p.id !== product.id && (p.category === product.category || p.collection === product.collection)
+  ).slice(0, 4);
+
   return (
-    <div className="mx-auto max-w-[1440px] px-5 md:px-10 py-6 md:py-10">
-      <nav className="text-[12px] tracking-[0.14em] opacity-60 flex gap-2 items-center" aria-label="Breadcrumb">
-        <Link to="/" className="hover:opacity-100">HOME</Link>/<Link to="/shop" className="hover:opacity-100">SHOP</Link>/<span className="text-[#171615] font-semibold">{product.name.toUpperCase()}</span>
+    <div className="min-h-screen bg-[#F2EFE8] text-[#0C0C0B] pb-24">
+      {/* Breadcrumb Bar */}
+      <nav aria-label="Breadcrumb" className="mx-auto max-w-[1440px] px-5 md:px-10 pt-6 pb-4">
+        <Link
+          to="/shop"
+          className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.2em] opacity-60 hover:opacity-100 transition"
+        >
+          <ArrowLeft size={14} /> BACK TO SHOP
+        </Link>
       </nav>
 
-      <div className="mt-6 grid lg:grid-cols-[1.15fr_1fr] gap-8 lg:gap-14">
-        <div>
-          <div className="flex gap-4">
-            <div className="hidden md:flex flex-col gap-3 w-[84px] shrink-0" role="tablist" aria-label="Product thumbnails">
-              {product.images.map((s, i) => (
-                <button key={i} role="tab" aria-selected={img === i} aria-label={`View image ${i + 1}`} onClick={() => setImg(i)} className={`aspect-[3/4] overflow-hidden border transition ${img === i ? "border-[#171615]" : "border-transparent opacity-60 hover:opacity-100"}`}>
-                  <img src={s} alt="" className="h-full w-full object-cover img-warm" loading="lazy" />
-                </button>
-              ))}
-            </div>
-            <div className="relative flex-1 overflow-hidden bg-[#EAE0CE] aspect-[3/4] group" data-cursor="view" data-cursor-label="ZOOM" onClick={() => setLightbox(true)}>
-              <AnimatePresence mode="wait">
-                <motion.img key={img} src={product.images[img]} alt={product.name} initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease: EASE }} className="img-warm absolute inset-0 h-full w-full object-cover" />
-              </AnimatePresence>
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 md:hidden">
-                {product.images.map((_, i) => <span key={i} className={`h-1.5 rounded-full transition-all ${i === img ? "w-6 bg-[#171615]" : "w-1.5 bg-black/30"}`} />)}
-              </div>
-              <button aria-label="Open fullscreen" className="absolute top-3 right-3 bg-[#F2EBDD]/90 p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition"><Expand size={16} /></button>
-              {product.badge && <span className="absolute left-3 top-3 bg-[#F2EBDD] px-2.5 py-1 text-[10px] font-bold tracking-[0.2em]">{product.badge.toUpperCase()}</span>}
-            </div>
-          </div>
-          <div className="flex md:hidden gap-2 mt-3 overflow-x-auto no-scrollbar snap-x">
-            {product.images.map((s, i) => (
-              <button key={i} onClick={() => setImg(i)} aria-label={`View image ${i + 1}`} className={`snap-center shrink-0 w-20 aspect-[3/4] overflow-hidden border ${img === i ? "border-[#171615]" : "border-black/10"}`}><img src={s} alt="" className="h-full w-full object-cover" loading="lazy" /></button>
+      {/* PDP Main Layout */}
+      <section className="mx-auto max-w-[1440px] px-5 md:px-10 grid lg:grid-cols-12 gap-10 items-start">
+        
+        {/* Left Column: 5-Image Gallery (Thumbnails + Main View) */}
+        <div className="lg:col-span-7 flex flex-col md:flex-row gap-4">
+          
+          {/* Vertical Thumbnail Strip */}
+          <div className="flex md:flex-col gap-3 order-2 md:order-1 overflow-x-auto md:overflow-y-auto no-scrollbar max-h-[640px] shrink-0">
+            {product.images.map((img, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveImageIndex(idx)}
+                className={`relative w-16 h-20 md:w-20 md:h-24 overflow-hidden border transition ${
+                  activeImageIndex === idx ? "border-[#0C0C0B] scale-95" : "border-transparent opacity-60 hover:opacity-100"
+                }`}
+              >
+                <img src={img} alt={`View ${idx + 1}`} className="h-full w-full object-cover img-warm" />
+                <span className="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[8px] font-bold text-center py-0.5">
+                  0{idx + 1}
+                </span>
+              </button>
             ))}
+          </div>
+
+          {/* Main Hero Viewer */}
+          <div className="relative flex-1 aspect-[3/4] bg-[#C9B99A]/30 overflow-hidden grain order-1 md:order-2 border border-[#0C0C0B]/10">
+            <motion.img
+              key={activeImageIndex}
+              src={product.images[activeImageIndex] || product.images[0]}
+              alt={product.name}
+              initial={{ opacity: 0.85, scale: 1.02 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="h-full w-full object-cover img-warm"
+            />
+
+            {/* Current Image Type Label */}
+            <div className="absolute top-4 left-4 bg-[#0C0C0B]/80 text-[#F2EFE8] backdrop-blur px-3 py-1 text-[10px] font-bold tracking-[0.24em]">
+              {imageLabels[activeImageIndex] || `SHOT 0${activeImageIndex + 1}`}
+            </div>
+
+            {product.badge && (
+              <div className="absolute top-4 right-4 bg-[#F2EFE8] text-[#0C0C0B] px-3 py-1 text-[10px] font-bold tracking-[0.2em] shadow-sm">
+                {product.badge.toUpperCase()}
+              </div>
+            )}
           </div>
         </div>
 
-        <div>
-          <p className="text-[11px] font-bold tracking-[0.3em] text-[#A6533C]">{product.collection.replace("-", " ").toUpperCase()} · MADE IN EGYPT</p>
-          <h1 className="font-display text-4xl md:text-6xl leading-[1] mt-2">{product.name}</h1>
-          <p className="font-arabic text-lg opacity-50 mt-1">{product.nameAr}</p>
-          <div className="flex items-center gap-3 mt-3">
-            <p className="text-2xl font-bold">{formatEGP(product.price)}</p>
-            {product.compareAt && <p className="line-through opacity-50">{formatEGP(product.compareAt)}</p>}
-            <span className="text-[13px] opacity-60">★ {product.rating} ({product.reviews})</span>
-          </div>
-          <p className="mt-5 leading-relaxed opacity-80 max-w-[520px]">{product.description}</p>
+        {/* Right Column: Product Specs & Story */}
+        <div className="lg:col-span-5 lg:sticky lg:top-28 space-y-6">
+          
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] font-bold tracking-[0.28em] text-[#A85C43] uppercase">
+                {product.collectionName || "MAKAN 001"}
+              </span>
+              <span className="text-[10px] tracking-wider opacity-50 uppercase">
+                · {product.gender} FIT
+              </span>
+            </div>
 
-          <div className="mt-6">
-            <p className="text-[12px] font-bold tracking-[0.2em]">COLOR — <span className="opacity-60">{color.toUpperCase()}</span></p>
-            <div className="flex gap-2.5 mt-2.5" role="radiogroup" aria-label="Color">
+            <h1 className="font-display text-4xl sm:text-5xl mt-2 leading-[1.05]">
+              {product.name}
+            </h1>
+            <p className="font-arabic text-xl text-[#A85C43] mt-1">{product.nameAr}</p>
+
+            <div className="mt-4 flex items-baseline gap-4">
+              <span className="text-2xl font-bold">{formatEGP(product.price)}</span>
+              {product.compareAt && (
+                <span className="text-base line-through opacity-50">{formatEGP(product.compareAt)}</span>
+              )}
+              <span className="text-[11px] tracking-widest text-emerald-800 bg-emerald-100 px-2 py-0.5 font-bold">
+                IN STOCK · CAIRO ATELIER
+              </span>
+            </div>
+          </div>
+
+          <p className="text-sm opacity-80 leading-relaxed font-normal border-t border-[#0C0C0B]/10 pt-4">
+            {product.description}
+          </p>
+
+          {/* Color Selector */}
+          <div className="space-y-2">
+            <span className="text-[11px] font-bold tracking-[0.2em] block opacity-70">
+              COLORWAY: <strong className="text-[#0C0C0B]">{selectedColor.toUpperCase()}</strong>
+            </span>
+            <div className="flex gap-2">
               {product.colors.map((c) => (
-                <button key={c.name} role="radio" aria-checked={color === c.name} aria-label={c.name} title={c.name} onClick={() => setColor(c.name)} className={`w-9 h-9 rounded-full border-2 grid place-items-center transition ${color === c.name ? "border-[#171615]" : "border-black/15"}`}>
-                  <span className="w-6 h-6 rounded-full border border-black/10" style={{ background: c.hex }} />
+                <button
+                  key={c.name}
+                  onClick={() => setSelectedColor(c.name)}
+                  title={c.name}
+                  className={`w-9 h-9 rounded-full border-2 transition-transform ${
+                    selectedColor === c.name ? "border-[#0C0C0B] scale-110" : "border-transparent hover:scale-105"
+                  }`}
+                  style={{ background: c.hex }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Size Selector */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-[11px] font-bold tracking-[0.2em] opacity-70">
+                SIZE: <strong className="text-[#0C0C0B]">{selectedSize}</strong>
+              </span>
+              <Link to="/size-guide" className="text-[11px] font-bold tracking-wider underline text-[#A85C43]">
+                SIZE GUIDE
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {product.sizes.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSelectedSize(s)}
+                  className={`px-5 py-2.5 text-[12px] font-bold tracking-[0.18em] border transition ${
+                    selectedSize === s
+                      ? "bg-[#0C0C0B] text-[#F2EFE8] border-[#0C0C0B]"
+                      : "border-[#0C0C0B]/20 hover:border-[#0C0C0B]"
+                  }`}
+                >
+                  {s}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="mt-6">
-            <div className="flex justify-between items-center">
-              <p className="text-[12px] font-bold tracking-[0.2em]">SIZE — <span className="opacity-60">{size}</span></p>
-              <Link to="/size-guide" className="text-[12px] underline underline-offset-4 inline-flex items-center gap-1 opacity-70 hover:opacity-100"><Ruler size={13} /> Size guide</Link>
+          {/* Quantity & CTA */}
+          <div className="pt-4 flex items-center gap-3">
+            {/* Quantity Selector */}
+            <div className="flex items-center border border-[#0C0C0B]/20 h-[52px]">
+              <button
+                onClick={() => setQty(Math.max(1, qty - 1))}
+                className="px-3 py-2 text-base font-bold hover:bg-black/5"
+              >
+                −
+              </button>
+              <span className="px-4 text-sm font-bold">{qty}</span>
+              <button
+                onClick={() => setQty(qty + 1)}
+                className="px-3 py-2 text-base font-bold hover:bg-black/5"
+              >
+                +
+              </button>
             </div>
-            <div className="grid grid-cols-4 gap-2 mt-2.5" role="radiogroup" aria-label="Size">
-              {product.sizes.map((s) => (
-                <button key={s} role="radio" aria-checked={size === s} onClick={() => setSize(s)} className={`py-3 border text-sm font-bold tracking-[0.1em] transition ${size === s ? "bg-[#171615] text-[#F2EBDD] border-[#171615]" : "rule border hover:border-[#171615]"}`}>{s}</button>
-              ))}
-            </div>
-          </div>
 
-          <div className="mt-6 flex gap-2.5">
-            <div className="flex items-center border rule border" aria-label="Quantity">
-              <button aria-label="Decrease quantity" className="px-3.5 py-3.5" onClick={() => setQty((q) => Math.max(1, q - 1))}><Minus size={15} /></button>
-              <span className="w-8 text-center font-bold" aria-live="polite">{qty}</span>
-              <button aria-label="Increase quantity" className="px-3.5 py-3.5" onClick={() => setQty((q) => Math.min(9, q + 1))}><Plus size={15} /></button>
-            </div>
-            <button onClick={add} className={`flex-1 text-[12px] font-bold tracking-[0.24em] transition-colors flex items-center justify-center gap-2 ${stage === "added" ? "bg-[#626B55] text-white" : "bg-[#171615] text-[#F2EBDD] btn-fill"}`} aria-live="polite">
-              {stage === "idle" && "ADD TO BAG"} {stage === "adding" && "ADDING…"} {stage === "added" && <><Check size={16} /> ADDED ✓</>}
+            {/* Add to Bag Button */}
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 bg-[#0C0C0B] text-[#F2EFE8] h-[52px] text-[12px] font-bold tracking-[0.24em] btn-fill flex items-center justify-center gap-2"
+            >
+              {added ? (
+                <>
+                  <Check size={18} /> ADDED TO BAG
+                </>
+              ) : (
+                "ADD TO BAG"
+              )}
             </button>
-            <motion.button whileTap={{ scale: 1.25 }} onClick={() => toggleWishlist(product.id)} aria-pressed={wished} aria-label="Toggle wishlist" className={`px-4 border transition ${wished ? "bg-[#A6533C] text-white border-[#A6533C]" : "rule border"}`}>
-              <Heart size={18} fill={wished ? "currentColor" : "none"} />
-            </motion.button>
+
+            {/* Wishlist Button */}
+            <button
+              onClick={() => toggleWishlist(product.id)}
+              className={`h-[52px] w-[52px] border flex items-center justify-center transition ${
+                wished ? "bg-[#A85C43] text-white border-[#A85C43]" : "border-[#0C0C0B]/20 hover:border-[#0C0C0B]"
+              }`}
+              aria-label="Save to Wishlist"
+            >
+              <Heart size={20} fill={wished ? "currentColor" : "none"} />
+            </button>
           </div>
 
-          <div className="mt-5 flex items-start gap-3 text-[13px] bg-[#EAE0CE]/50 border rule border p-3.5">
-            <Truck size={17} className="shrink-0 mt-0.5" />
-            <p><b>Standard Egypt 2–4 days · EGP 85.</b> Express Cairo · EGP 140. Free over EGP 3,000. Cash on delivery available. <Link to="/faq" className="underline underline-offset-4">Details</Link></p>
-          </div>
-
-          <div className="mt-6 border-t rule border-t">
-            {[["details", "Details & fit"], ["origin", "Made in Egypt"], ["shipping", "Shipping & returns"]].map(([k, label]) => (
-              <div key={k} className="border-b rule border-b">
-                <button onClick={() => setTab(tab === k ? "" : k)} aria-expanded={tab === k} className="w-full flex justify-between py-4 text-[13px] font-bold tracking-[0.18em]">{label}<span>{tab === k ? "−" : "+"}</span></button>
-                <AnimatePresence initial={false}>
-                  {tab === k && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.4, ease: EASE }} className="overflow-hidden">
-                      <div className="pb-5 text-[14px] leading-relaxed opacity-80 space-y-2">
-                        {k === "details" && <><p><b>Materials:</b> {product.materials}</p><p><b>Fit:</b> {product.fit}</p><p><b>Care:</b> {product.care}</p></>}
-                        {k === "origin" && <><p><b>Fabric:</b> {product.origin.fabric}</p><p><b>Made:</b> {product.origin.made}</p><p><b>Cotton:</b> {product.origin.cotton}</p><p className="font-arabic">صنع في مصر — بفخر.</p></>}
-                        {k === "shipping" && <p>Try at home — 14-day free returns in Cairo & Giza, 30 EGP rest of Egypt. Refunds to card in 3–5 days, COD refunds via bank transfer or store credit.</p>}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+          {/* Material & Production Origin Breakdown */}
+          <div className="border-t border-[#0C0C0B]/10 pt-6 space-y-3 text-xs opacity-80">
+            <div className="flex items-start gap-3">
+              <ShieldCheck size={16} className="text-[#A85C43] shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-bold text-[#0C0C0B]">FABRIC & MATERIAL:</strong>
+                <p className="mt-0.5">{product.materials}</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+            </div>
 
-      <section className="mt-16 md:mt-24" aria-label="You may also like">
-        <div className="flex items-end justify-between">
-          <h2 className="font-display text-3xl md:text-5xl">Pairs well with.</h2>
-          <Link to="/shop" className="u-link text-[12px] font-bold tracking-[0.22em] hidden sm:inline-flex items-center gap-1">SHOP ALL <ArrowRight size={14} /></Link>
-        </div>
-        <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
-          {related.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
+            <div className="flex items-start gap-3">
+              <MapPin size={16} className="text-[#A85C43] shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-bold text-[#0C0C0B]">PRODUCTION ORIGIN:</strong>
+                <p className="mt-0.5">{product.origin?.fabric} · {product.origin?.made}</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <Truck size={16} className="text-[#A85C43] shrink-0 mt-0.5" />
+              <div>
+                <strong className="font-bold text-[#0C0C0B]">SHIPPING & RETURNS:</strong>
+                <p className="mt-0.5">Free Cairo delivery over EGP 3,000. Cash on delivery available across Egypt.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <AnimatePresence>
-        {lightbox && (
-          <motion.div className="fixed inset-0 z-[90] bg-[#171615]/95 grid place-items-center p-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLightbox(false)} role="dialog" aria-modal="true" aria-label="Image viewer">
-            <button aria-label="Close viewer" className="absolute top-5 right-5 text-white p-2"><X size={26} /></button>
-            <button aria-label="Previous image" onClick={(e) => { e.stopPropagation(); setImg((v) => (v - 1 + product.images.length) % product.images.length); }} className="absolute left-4 text-white p-3"><ArrowLeft size={24} /></button>
-            <motion.img key={img} src={product.images[img]} alt={product.name} initial={{ scale: 0.96 }} animate={{ scale: 1 }} className="max-h-[86vh] max-w-[92vw] object-contain" onClick={(e) => e.stopPropagation()} />
-            <button aria-label="Next image" onClick={(e) => { e.stopPropagation(); setImg((v) => (v + 1) % product.images.length); }} className="absolute right-4 text-white p-3"><ArrowRight size={24} /></button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Recommendation Rail */}
+      {relatedProducts.length > 0 && (
+        <section className="mx-auto max-w-[1440px] px-5 md:px-10 mt-28 border-t border-[#0C0C0B]/10 pt-16">
+          <p className="text-[11px] font-bold tracking-[0.3em] text-[#A85C43]">
+            COMPLETE THE LOOK
+          </p>
+          <h2 className="font-display text-3xl sm:text-5xl mt-2">YOU MAY ALSO LIKE</h2>
+          <p className="font-arabic text-xl opacity-60 mt-1">قطع تكمل هذه الإطلالة</p>
+
+          <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-12">
+            {relatedProducts.map((p, idx) => (
+              <ProductCard key={p.id} product={p} index={idx} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

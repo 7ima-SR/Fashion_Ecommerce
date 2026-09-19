@@ -1,61 +1,95 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
-import { Monogram } from "../brand/Logo";
+import { BRAND } from "../../data/brand";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#171615] text-[#F2EBDD] mt-0" aria-label="Footer">
-      <div className="mx-auto max-w-[1440px] px-5 md:px-10 pt-16 pb-8">
-        <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
+    <footer className="bg-[#0C0C0B] text-[#F2EFE8] pt-20 pb-12 border-t border-white/10" aria-label="Footer">
+      <div className="mx-auto max-w-[1440px] px-5 md:px-10">
+        
+        {/* Top Banner Quote */}
+        <div className="border-b border-white/10 pb-16 grid lg:grid-cols-2 gap-8 items-end">
           <div>
-            <div className="flex items-center gap-4">
-              <Monogram />
-              <div>
-                <p className="tracking-[0.22em] font-bold text-lg">MAKAN</p>
-                <p className="font-arabic text-sm opacity-60">مَكان · القاهرة</p>
-              </div>
-            </div>
-            <p className="font-display text-2xl mt-6 leading-snug max-w-[320px]">Made here.<br />Worn everywhere.</p>
-            <p className="font-arabic mt-2 opacity-60">من هنا. إلى كل مكان.</p>
-            <form className="mt-6 flex max-w-[340px]" onSubmit={(e) => e.preventDefault()}>
-              <label htmlFor="nl-email" className="sr-only">Email for newsletter</label>
-              <input id="nl-email" type="email" required placeholder="Email for studio notes" className="field field-dark !border-r-0 flex-1" />
-              <button className="border border-[#F2EBDD]/25 px-4 hover:bg-[#F2EBDD] hover:text-[#171615] transition" aria-label="Subscribe"><ArrowUpRight size={18} /></button>
-            </form>
+            <span className="text-[11px] font-bold tracking-[0.3em] text-[#C9B99A] block mb-3">
+              MAKAN / Cairo · {BRAND.coordinates}
+            </span>
+            <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl leading-[1.05]">
+              MADE HERE.<br />
+              <span className="italic text-[#C9B99A]">WORN EVERYWHERE.</span>
+            </h2>
           </div>
-          <nav aria-label="Shop">
-            <p className="text-[11px] tracking-[0.28em] opacity-50 mb-4">SHOP</p>
-            <ul className="space-y-2.5 text-[15px]">
-              <li><Link className="u-link" to="/shop">All pieces</Link></li>
-              <li><Link className="u-link" to="/shop?tag=new">New arrivals</Link></li>
-              <li><Link className="u-link" to="/collections">Collections</Link></li>
-              <li><Link className="u-link" to="/size-guide">Size guide</Link></li>
-              <li><Link className="u-link" to="/wishlist">Wishlist</Link></li>
-            </ul>
-          </nav>
-          <nav aria-label="Brand">
-            <p className="text-[11px] tracking-[0.28em] opacity-50 mb-4">BRAND</p>
-            <ul className="space-y-2.5 text-[15px]">
-              <li><Link className="u-link" to="/story">Our story</Link></li>
-              <li><Link className="u-link" to="/journal">Journal</Link></li>
-              <li><Link className="u-link" to="/contact">Contact</Link></li>
-              <li><Link className="u-link" to="/faq">FAQ & shipping</Link></li>
-              <li><Link className="u-link" to="/orders">Track orders</Link></li>
-            </ul>
-          </nav>
-          <div>
-            <p className="text-[11px] tracking-[0.28em] opacity-50 mb-4">CAIRO ATELIER</p>
-            <address className="not-italic text-[15px] leading-relaxed opacity-80">
-              2nd floor, Kasr El Nil<br />Wasat El Balad, Cairo<br />
-              <a href="tel:+201000000000" className="u-link">+20 100 000 0000</a><br />
-              <a href="mailto:salam@makan-cairo.com" className="u-link">salam@makan-cairo.com</a>
-            </address>
-            <p className="mt-4 text-sm opacity-50">Sat–Thu · 10am–8pm<br />Cash on delivery across Egypt.</p>
+
+          <div className="text-left lg:text-right">
+            <p className="font-arabic text-2xl text-[#C9B99A] mb-2 leading-relaxed">
+              من القاهرة، بقَصْدِ وابتكار.
+            </p>
+            <p className="text-sm opacity-60 max-w-[420px] lg:ml-auto leading-relaxed">
+              A contemporary Egyptian fashion label shaped by place, identity, memory, culture, and movement.
+            </p>
           </div>
         </div>
-        <div className="mt-14 pt-6 border-t border-white/12 flex flex-col md:flex-row gap-3 justify-between text-[12px] tracking-[0.14em] opacity-60">
-          <span>© 2026 MAKAN CAIRO · ALL GARMENTS MADE IN EGYPT</span>
-          <span className="flex gap-5"><Link to="/faq">SHIPPING</Link><Link to="/faq">RETURNS</Link><Link to="/size-guide">SIZES</Link></span>
+
+        {/* Navigation Grid */}
+        <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 text-sm">
+          {/* Brand Col */}
+          <div className="col-span-2 md:col-span-4 lg:col-span-2">
+            <Link to="/" className="inline-block text-2xl font-bold tracking-[0.22em] mb-3">
+              MAKAN <span className="font-arabic text-lg font-normal text-[#C9B99A]">مَكان</span>
+            </Link>
+            <p className="text-xs opacity-60 leading-relaxed max-w-[320px] mt-2">
+              Kasr El Nil Atelier, Downtown Cairo.<br />
+              Delta Flax Linen & Giza Cotton engineered for movement.
+            </p>
+            <div className="mt-6 text-[11px] tracking-[0.2em] text-[#C9B99A]">
+              EST. 2021 — CAIRO, EGYPT
+            </div>
+          </div>
+
+          {/* Shop Column */}
+          <div>
+            <h3 className="text-[11px] font-bold tracking-[0.25em] text-[#C9B99A] uppercase mb-4">Shop</h3>
+            <ul className="space-y-2.5 opacity-75 text-xs tracking-wider">
+              <li><Link to="/shop" className="hover:text-[#C9B99A] transition">New Arrivals</Link></li>
+              <li><Link to="/shop?cat=shirts" className="hover:text-[#C9B99A] transition">Shirts & Tunics</Link></li>
+              <li><Link to="/shop?cat=trousers" className="hover:text-[#C9B99A] transition">Trousers</Link></li>
+              <li><Link to="/shop?cat=outerwear" className="hover:text-[#C9B99A] transition">Outerwear</Link></li>
+              <li><Link to="/shop?cat=dresses" className="hover:text-[#C9B99A] transition">Dresses</Link></li>
+            </ul>
+          </div>
+
+          {/* Editorial Column */}
+          <div>
+            <h3 className="text-[11px] font-bold tracking-[0.25em] text-[#C9B99A] uppercase mb-4">Editorial</h3>
+            <ul className="space-y-2.5 opacity-75 text-xs tracking-wider">
+              <li><Link to="/collections" className="hover:text-[#C9B99A] transition">Collections 01-05</Link></li>
+              <li><Link to="/lookbook" className="hover:text-[#C9B99A] transition">Lookbook</Link></li>
+              <li><Link to="/campaign" className="hover:text-[#C9B99A] transition">Campaign 001</Link></li>
+              <li><Link to="/made-in-egypt" className="hover:text-[#C9B99A] transition">Made in Egypt</Link></li>
+              <li><Link to="/story" className="hover:text-[#C9B99A] transition">Brand Story</Link></li>
+            </ul>
+          </div>
+
+          {/* Customer Care */}
+          <div>
+            <h3 className="text-[11px] font-bold tracking-[0.25em] text-[#C9B99A] uppercase mb-4">Care & Contact</h3>
+            <ul className="space-y-2.5 opacity-75 text-xs tracking-wider">
+              <li><Link to="/support" className="hover:text-[#C9B99A] transition">Shipping & Returns</Link></li>
+              <li><Link to="/support" className="hover:text-[#C9B99A] transition">Size Guide</Link></li>
+              <li><Link to="/support" className="hover:text-[#C9B99A] transition">Cash on Delivery</Link></li>
+              <li><Link to="/support" className="hover:text-[#C9B99A] transition">Contact Atelier</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-[11px] opacity-60 tracking-[0.18em] gap-4">
+          <p>© {new Date().getFullYear()} MAKAN LABEL. ALL RIGHTS RESERVED. MADE IN EGYPT.</p>
+          <div className="flex gap-6">
+            <span>CAIRO</span>
+            <span>ALEXANDRIA</span>
+            <span>DUBAI</span>
+            <span>LONDON</span>
+            <span>PARIS</span>
+          </div>
         </div>
       </div>
     </footer>

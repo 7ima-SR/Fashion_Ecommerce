@@ -1,22 +1,46 @@
+// src/data/brand.js
+
 export const BRAND = {
   nameEn: "MAKAN",
   nameAr: "مَكان",
   fullEn: "MAKAN — Cairo",
-  taglineEn: "Made here. Worn everywhere.",
-  taglineAr: "من هنا. إلى كل مكان.",
-  philosophy: "Modern Egyptian identity, designed for today.",
+  taglineEn: "MADE HERE. WORN EVERYWHERE.",
+  taglineAr: "صُنِعَ هنا. يُرتَدى في كل مكان.",
+  subTaglineEn: "FROM CAIRO, WITH INTENT.",
+  subTaglineAr: "من القاهرة، بقَصْدِ وابتكار.",
+  coordinates: "30.0444° N, 31.2357° E",
+  city: "CAIRO / القاهرة",
+  season: "SPRING — SUMMER 2026",
+  collectionNo: "MAKAN / 001",
+  
+  concept: "PLACE · IDENTITY · MEMORY · CULTURE · MOVEMENT",
+  philosophy: "MAKAN explores the relationship between place, identity, memory, culture, and movement — inspired by Egypt without being trapped in nostalgia.",
+  
   storyShort:
-    "MAKAN means place — belonging. We cut, sew and finish everything in Egypt from long-staple Egyptian cotton and washed linen, then design it to live anywhere: Cairo mornings, Alexandria wind, anywhere else.",
+    "MAKAN means PLACE. Built from the rhythm of Cairo — concrete, movement, heat, and human scale. Cut, woven, and finished in Egypt from long-staple Giza cotton and washed linen, designed for movement anywhere.",
+
   storyLong: [
-    "MAKAN began in a second-floor atelier off Kasr El Nil with one idea: Egyptian identity doesn't need to be preserved in the past. It can evolve. It can be minimal. It can be global.",
-    "We don't recreate Egypt. We reinterpret it — the proportion of a balcony arch, the shade of a shisha-café wall at 5pm, the weight of a grandfather's galabeya cut like a modern overshirt.",
-    "Every piece is made in Egypt. Not as a slogan, but as a supply chain: cotton from the Delta, weaving in Mehalla, stitching in Cairo, washing and finishing by hand. Fewer, better pieces — built for Cairo, ready for anywhere.",
+    "MAKAN began with a refusal: to let Egyptian identity be reduced to tourist souvenirs or ancient Pharaonic costumes. Egypt is alive. It is Downtown concrete, balcony shade at 5 PM, sun-bleached cotton, metal shutters, and the quiet dignity of handmade cloth.",
+    "We don't recreate Egypt. We reinterpret it — the proportion of an archway translated into a collar seam, the weight of traditional workwear recut into modern silhouettes, the deep tactile richness of Delta flax.",
+    "Every piece is made in Egypt with intent. Cotton from Giza ginning mills, weaving in Mehalla El Kubra, tailoring in Cairo ateliers, and hand-finishing by local artisans. Built in Cairo, worn everywhere.",
   ],
+
+  palette: {
+    offWhite: "#F2EFE8",
+    sand: "#C9B99A",
+    stone: "#9B9386",
+    charcoal: "#1A1A18",
+    black: "#0C0C0B",
+    deepOlive: "#3F4636",
+    terracotta: "#A85C43",
+    burntOrange: "#B66A3C",
+    nileBlue: "#263F48",
+  },
 };
 
 export const EASE = [0.22, 1, 0.36, 1];
 
-const U = (id, w = 1200) => `https://images.unsplash.com/${id}?q=80&w=${w}&auto=format&fit=crop`;
+const U = (id, w = 1600) => `https://images.unsplash.com/${id}?q=80&w=${w}&auto=format&fit=crop`;
 
 export const IMAGES = {
   hero: U("photo-1490481651871-ab68de25d43d", 1800),
@@ -29,4 +53,5 @@ export const IMAGES = {
   studio: U("photo-1515886657613-9f3515b0c78f", 1400),
   craft: U("photo-1452860606245-08befc0ff44b", 1400),
   alex: U("photo-1509631179647-0177331693ae", 1400),
+  concrete: U("photo-1513694203232-719a280e022f", 1400),
 };
